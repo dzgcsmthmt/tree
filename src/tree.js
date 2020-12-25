@@ -25,33 +25,44 @@ class Tree{
         let newVertices,newEdge = null,parent = this.current && this.verticesMap[this.current.id];
         
         if(parent){
-            // let len = parent.children.length;
+            let len = parent.children.length;
             newEdge = this.edgesMap[this.edgeId] = new Edge(parent,this.edgeId++,40,80,'v',parseInt(parent.ele.style.top) + 42,parseInt(parent.ele.style.left) + 80);
             this.container.appendChild(newEdge.ele);
             parent.edges.push(newEdge);
+
+            newVertices = this.verticesMap[this.verticesId] = new Vertices({
+                id: this.verticesId++,
+                parent: parent || null,
+                width: 200,
+                fromEdge: newEdge,
+                index: len,
+                left: len == 0 ? parent.left : parent.children[len - 1].end + 20,
+                top: parseInt(parent.top) + 42 + 80
+            });
+        }else{
+            newVertices = this.verticesMap[this.verticesId] = new Vertices({
+                id: this.verticesId++,
+                parent: parent || null,
+                width: 200,
+                fromEdge: newEdge,
+                index: 0,
+                left: (2000 - 200) >> 1,
+                top: 20
+            });
         }
 
-        newVertices = this.verticesMap[this.verticesId] = new Vertices({
-            id: this.verticesId++,
-            parent: parent || null,
-            width: 200,
-            fromEdge: newEdge,
-            index: parent && parent.children.length || 0,
-        });
         
+        this.container.appendChild(newVertices.ele);
+
         if(!this.current){
             this.current = newVertices;
+            newVertices.ele.classList.add('active');
         }
-        this.container.appendChild(newVertices.ele);
 
         if(parent){
             parent.children.push(newVertices);
             this.layoutCurrent(this.current);
             parent.children.length > 1 && this.relayout(this.current);
-        }else{
-            newVertices.ele.style.left = ((2000 - 200) >> 1) + 'px';
-            newVertices.ele.style.top = '20px';
-            newVertices.ele.classList.add('active');
         }
     }
 
@@ -85,7 +96,7 @@ class Tree{
                 let child = node.children[l];
                 let base = node.children[l + 1];
                 let oLeft = parseInt(child.ele.style.left);
-                let left = parseInt(base.ele.style.left) - (base.width - 200) / 2 - child.width + (child.width - 200) / 2 + 20;
+                let left = base.begin - child.width + (child.width - 200) / 2 - 20;
                 child.move(-Math.abs(oLeft - left));
                 node.edges[l].update(node.edges[l].ele,Math.abs(parentLeft - left),80,'l').setPosition(left + 100);
                 l--;
@@ -94,8 +105,8 @@ class Tree{
                 let child = node.children[r];
                 let base = node.children[r - 1];
                 let oLeft = parseInt(child.ele.style.left);
-                let left = parseInt(base.ele.style.left) + (base.width - 200) / 2 + 20 + (child.width - 200) / 2;
-                child.move(Math.abs(oLeft - left));
+                let left = base.end + 20 + (child.width - 200) / 2;
+                child.move(-Math.abs(oLeft - left));
                 node.edges[r].update(node.edges[r].ele,Math.abs(parentLeft - left),80,'r').setPosition(center);
                 r++;
             }
@@ -113,7 +124,7 @@ class Tree{
             child = node.children[r];
             oLeft = parseInt(child.ele.style.left);
             left = center + 10 + (child.width - 200) / 2;
-            child.move(Math.abs(oLeft - left));
+            child.move(-Math.abs(oLeft - left));
             node.edges[r].update(node.edges[r].ele,Math.abs(left - parentLeft),80,'r').setPosition(center);
             r++;
 
@@ -121,7 +132,7 @@ class Tree{
                 let child = node.children[l];
                 let base = node.children[l + 1];
                 let oLeft = parseInt(child.ele.style.left);
-                let left = parseInt(base.ele.style.left) - (base.width - 200) / 2 - child.width + (child.width - 200) / 2 + 20;
+                let left = base.begin - child.width + (child.width - 200) / 2 - 20;
                 child.move((-Math.abs(oLeft - left)));
                 node.edges[l].update(node.edges[l].ele,Math.abs(parentLeft - left),80,'l').setPosition(left + 100);
                 l--;
@@ -130,8 +141,8 @@ class Tree{
                 let child = node.children[r];
                 let base = node.children[r - 1];
                 let oLeft = parseInt(child.ele.style.left);
-                let left = parseInt(base.ele.style.left) + (base.width - 200) / 2 + 20 + (child.width - 200) / 2;
-                child.move(Math.abs(oLeft - left));
+                let left = base.end + 20 + (child.width - 200) / 2;
+                child.move(-Math.abs(oLeft - left));
                 node.edges[r].update(node.edges[r].ele,Math.abs(parentLeft - left),80,'r').setPosition(center);
                 r++;
             }
