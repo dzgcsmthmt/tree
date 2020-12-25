@@ -61,16 +61,92 @@ class Tree{
         let mid = len >> 1;
         if(len == 1) return;
         let parentLeft = parseInt(node.ele.style.left);
-        for(let i = 0; i < len - 1;i++){
+        let center = parentLeft + 100;
+        //这个添加还比较麻烦，比想象中复杂
+        /**
+         * 简化思路 
+         * 1.奇数个点 以中间为基准算两边
+         * 2.偶数个点 以中间2个元素为基准两边扩散 
+         *  为了全部移动，不能使用setPosition方法，每次计算left的差值，调用move方法
+         */
+
+        if(len & 1){
+            let index = mid;
+            let l= mid - 1;
+            let r = mid + 1;
+            //处理中间
+            let child = node.children[index];
+            let oLeft = parseInt(child.ele.style.left);
+            let left = center - child.width / 2;
+            child.move(-Math.abs(oLeft - left));
+            node.edges[index].update(node.edges[index].ele,40,80,'v').setPosition(center - 20);
+           
+            while(l >= 0){
+                let child = node.children[l];
+                let base = node.children[l + 1];
+                let oLeft = parseInt(child.ele.style.left);
+                let left = parseInt(base.ele.style.left) - (base.width - 200) / 2 - child.width + (child.width - 200) / 2 + 20;
+                child.move(-Math.abs(oLeft - left));
+                node.edges[l].update(node.edges[l].ele,Math.abs(parentLeft - left),80,'l').setPosition(left + 100);
+                l--;
+            }
+            while(r < len){
+                let child = node.children[r];
+                let base = node.children[r - 1];
+                let oLeft = parseInt(child.ele.style.left);
+                let left = parseInt(base.ele.style.left) + (base.width - 200) / 2 + 20 + (child.width - 200) / 2;
+                child.move(Math.abs(oLeft - left));
+                node.edges[r].update(node.edges[r].ele,Math.abs(parentLeft - left),80,'r').setPosition(center);
+                r++;
+            }
+        }else{
+            let l = mid - 1;
+            let r = mid;
+
+            let child = node.children[l];
+            let oLeft = parseInt(child.ele.style.left);
+            let left = center - 10 - child.width + (child.width - 200) / 2;
+            child.move(-Math.abs(oLeft - left));
+            node.edges[l].update(node.edges[l].ele,Math.abs(left - parentLeft),80,'l').setPosition(left + 100);
+            l--;
+
+            child = node.children[r];
+            oLeft = parseInt(child.ele.style.left);
+            left = center + 10 + (child.width - 200) / 2;
+            child.move(Math.abs(oLeft - left));
+            node.edges[r].update(node.edges[r].ele,Math.abs(left - parentLeft),80,'r').setPosition(center);
+            r++;
+
+            while(l >= 0){
+                let child = node.children[l];
+                let base = node.children[l + 1];
+                let oLeft = parseInt(child.ele.style.left);
+                let left = parseInt(base.ele.style.left) - (base.width - 200) / 2 - child.width + (child.width - 200) / 2 + 20;
+                child.move((-Math.abs(oLeft - left)));
+                node.edges[l].update(node.edges[l].ele,Math.abs(parentLeft - left),80,'l').setPosition(left + 100);
+                l--;
+            }
+            while(r < len){
+                let child = node.children[r];
+                let base = node.children[r - 1];
+                let oLeft = parseInt(child.ele.style.left);
+                let left = parseInt(base.ele.style.left) + (base.width - 200) / 2 + 20 + (child.width - 200) / 2;
+                child.move(Math.abs(oLeft - left));
+                node.edges[r].update(node.edges[r].ele,Math.abs(parentLeft - left),80,'r').setPosition(center);
+                r++;
+            }
+        }
+
+        /*for(let i = 0; i < len - 1;i++){
             node.children[i].move(-110);
             let edge = node.edges[i];
             let left = parseInt(node.children[i].ele.style.left);
-            edge.update(edge.ele,len & 1 && i == mid ? 40 :Math.abs(parentLeft - left),80,i < mid ? 'l' : len & 1 && i == mid ? 'v' : 'r').setPosition(i < mid ? left + 100 : (len & 1 && i == mid) ? left + 80 : parseInt(node.ele.style.left) + 100);
+            edge.update(edge.ele,len & 1 && i == mid ? 40 :Math.abs(parentLeft - left),80,i < mid ? 'l' : len & 1 && i == mid ? 'v' : 'r').setPosition(i < mid ? left + 100 : (len & 1 && i == mid) ? parentLeft + 80 : parentLeft + 100);
         }
         let newNode = node.children[len - 1];
         var lastNode = node.children[len - 2];
         newNode.ele.style.left = parseInt(lastNode.ele.style.left) + lastNode.width - ((lastNode.width - 200) / 2)  + 20 + 'px';
-        node.edges[len - 1].update(node.edges[len - 1].ele,parseInt(newNode.ele.style.left) - parseInt(node.ele.style.left),80,'r').setPosition(parseInt(node.ele.style.left) + 100);
+        node.edges[len - 1].update(node.edges[len - 1].ele,parseInt(newNode.ele.style.left) - parseInt(node.ele.style.left),80,'r').setPosition(parseInt(node.ele.style.left) + 100);*/
     }
 
     relayout(node){
