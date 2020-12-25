@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>svg</title>
+   <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+    <div class="flex">
+        <div class="btn-wrap">
+            <button id="add-btn">添加节点</button>
+            <button id="del-btn">删除节点</button>
+        </div>
+        <div id="canvas-wrap">
+            <div id="canvas"></div>
+        </div>
+    </div>
+
+    <script src="./app.js" type="module">
+        
+
+        /*function addVertice(parentId,id){
+            var node = {};
+            var edge = {};
+            var parent = null;
+            node.id = id;
+            node.children = [];
+            node.edges = [];
+            node.parent = parentId;
+
+            var ele = createNode(id);
+            
+            
+            if(parent = ids[parentId]){
+                parent.children.push(id);
+                parent.edges.push(edgeId);
+                let len = parent.children.length;
+                if(len == 1){
+                    ele.style.left = parseInt(parent.ele.style.left) + 'px';
+                    ele.style.top = parseInt(parent.ele.style.top) + 42 + 80 + 'px';  
+                    let edgeEle = createEdge(edgeId,40,80,'v');
+                    edgeEle.style.top = parseInt(parent.ele.style.top) + 42 + 'px';
+                    edgeEle.style.left = parseInt(parent.ele.style.left) + 100 - 20 + 'px';
+                    oCanvas.appendChild(edgeEle);
+                }else{
+                    ele.style.left = parseInt(ids[parent.children[len - 2]].ele.style.left) + 110 + 'px';
+                    ele.style.top = parseInt(parent.ele.style.top) + 42 + 80 + 'px'; 
+                    let edgeEle = createEdge(edgeId,parseInt(ele.style.left) - parseInt(parent.ele.style.left),80,'r');
+                    edgeEle.style.top = parseInt(parent.ele.style.top) + 42 + 'px';
+                    edgeEle.style.left = parseInt(parent.ele.style.left) + 100 + 'px';
+                    oCanvas.appendChild(edgeEle);
+                    for(var i = 0;i < len - 1;i++){
+                        let sibling = ids[parent.children[i]].ele;
+                        sibling.style.left = parseInt(sibling.style.left) - 110 + 'px';
+                        let svg = document.getElementById('edge' + parent.edges[i]);
+
+                        if(len & 1){
+                            if(i < (len >> 1)){
+                                updateEdge(svg,parseInt(parent.ele.style.left) - parseInt(sibling.style.left),80,'l');
+                                svg.style.left = parseInt(sibling.style.left) + 100 + 'px';
+                            }else if(i == (len >> 1)){
+                                updateEdge(document.getElementById('edge' + parent.edges[i]),40,80,'v');
+                                svg.style.left = parseInt(parent.ele.style.left) + 80 + 'px';
+                            }else{
+                                updateEdge(svg,parseInt(sibling.style.left) - parseInt(parent.ele.style.left),80,'r');
+                                svg.style.left = parseInt(parent.ele.style.left) + 100 + 'px';
+                            }
+                        }else{
+                            if(i < (len >> 1)){
+                                updateEdge(svg,parseInt(parent.ele.style.left) - parseInt(sibling.style.left),80,'l');
+                                svg.style.left = parseInt(sibling.style.left) + 100 + 'px';
+                            }else {
+                                updateEdge(svg,parseInt(sibling.style.left) - parseInt(parent.ele.style.left),80,'r');
+                                svg.style.left = parseInt(parent.ele.style.left) + 100 + 'px';
+                            }
+                        }
+                    }
+
+                    
+                }
+                node.fromEdge = edgeId;
+                node.index = parent.children.length - 1;
+            }else{
+                ele.style.left = ((2000 - 200) >> 1) + 'px';
+                ele.style.top = '20px';
+                ele.classList.add('active');
+                currentId = edgeId;
+            }
+            
+            oCanvas.appendChild(ele);
+            edgeId++;
+            node.ele = ele;
+            ids[id] = node;
+
+
+            if(parent && parent.parent && parent.children.length > 1){
+               
+                let children = ids[parent.parent].children;
+
+                //奇数并且中间的位置，两边扩散
+                if(children.length & 1 && parent.index == (children.length >> 1)){
+                    for(var i = 0; i < parent.index;i++){
+                        moveNode(ids[children[i]].ele,-110);
+                        moveEdge(ids[children[i]].fromEdge,-110,'l');
+                    }
+                    for(var i = parent.index + 1;i < children.length;i++){
+                        moveNode(ids[children[i]].ele,110);
+                        moveEdge(ids[children[i]].fromEdge,110,'r');
+                    }
+                }else{
+                    if(parent.index < (children.length >> 1)){
+                        moveNode(parent.ele,-110);
+                        moveEdge(parent.fromEdge,-110,'l');
+                        for(var i = 0; i < parent.index;i++){
+                            moveNode(ids[children[i]].ele,-2 * 110);
+                            moveEdge(ids[children[i]].fromEdge,-2 * 110,'l');
+                        }
+                    }else if (parent.index >= (children.length >> 1)){
+                        moveNode(parent.ele,110);
+                        moveEdge(parent.fromEdge,110,'r');
+                        for(var i = parent.index + 1;i < children.length;i++){
+                            moveNode(ids[children[i]].ele,2 * 110);
+                            moveEdge(ids[children[i]].fromEdge,2 * 110,'r');
+                        }
+                    }
+                }
+                
+            }
+        }
+
+        function createNode(id){
+            var oDiv = document.createElement('div');
+            oDiv.className = 'vertice';
+            oDiv.innerHTML = 'node' + id;
+            oDiv.dataset.id = id;
+
+            //drag
+            oDiv.onmousedown = function(ev){
+                var x = ev.pageX;
+                var y = ev.pageY;
+                var left = new WebKitCSSMatrix(oDiv.style.transform).m41;
+                var top = new WebKitCSSMatrix(oDiv.style.transform).m42;
+                document.onmousemove = function(ev){
+                    var newX = ev.pageX;
+                    var newY = ev.pageY;
+                    oDiv.style.transform = `translate(${left + newX - x}px,${top + newY - y}px)`; 
+                }
+                document.onmouseup = function(){
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                }
+            }
+
+            return oDiv;
+        }
+
+
+        function createEdge(id,w,h,direction){
+            const svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+            // set width and height
+            svg1.setAttribute("width", w + '');
+            svg1.setAttribute("height", h + '');
+            svg1.setAttribute("fill", "none");
+            svg1.setAttribute("id", `edge${id}`);
+            if(direction == 'r'){
+                svg1.innerHTML = `<path d="M0 0L0 ${h / 2}L${w - 5} ${h / 2}L${w - 5} ${h}" stroke="#C5CCD0" stroke-width="2px"></path><path d="M${w - 10} ${h - 5}H${w}L${w - 5} ${h}L${w - 10} ${h - 5}Z" fill="#C5CCD0"></path>`;
+            }else if(direction == 'l'){
+                svg1.innerHTML = `<path d="M${w} 0L${w} ${h / 2}L5 ${h}L5 ${h}" stroke="#C5CCD0" stroke-width="2px"></path><path d="M0 ${h - 5}H10L5 ${h}L0 ${h - 5}Z" fill="#C5CCD0"></path>`;
+            }else{
+                svg1.innerHTML = `<path d="M${w / 2} 0L${w / 2} ${h}" stroke="#C5CCD0" stroke-width="2px"></path><path d="M${w / 2 - 5} ${h - 5}H${w / 2 + 5}L${w / 2} ${h}L${w / 2 - 5} ${h - 5}Z" fill="#C5CCD0"></path>`;
+            }
+
+            return svg1;
+        }
+
+        function updateEdge(svg1,w,h,direction){
+            svg1.setAttribute("width", w + '');
+            svg1.setAttribute("height", h + '');
+            if(direction == 'r'){
+                svg1.innerHTML = `<path d="M0 0L0 ${h / 2}L${w - 5} ${h / 2}L${w - 5} ${h}" stroke="#C5CCD0" stroke-width="2px"></path><path d="M${w - 10} ${h - 5}H${w}L${w - 5} ${h}L${w - 10} ${h - 5}Z" fill="#C5CCD0"></path>`;
+            }else if(direction == 'l'){
+                svg1.innerHTML = `<path d="M${w} 0L${w} ${h / 2}L5 ${h / 2}L5 ${h}" stroke="#C5CCD0" stroke-width="2px"></path><path d="M0 ${h - 5}H10L5 ${h}L0 ${h - 5}Z" fill="#C5CCD0"></path>`;
+            }else{
+                svg1.innerHTML = `<path d="M${w / 2} 0L${w / 2} ${h}" stroke="#C5CCD0" stroke-width="2px"></path><path d="M${w / 2 - 5} ${h - 5}H${w / 2 + 5}L${w / 2} ${h}L${w / 2 - 5} ${h - 5}Z" fill="#C5CCD0"></path>`;
+            }
+        }
+
+        function moveNode(ele,distance){
+            var id = ele.dataset.id;
+            var node;
+            if(node = ids[id]){
+                ele.style.left = parseInt(ele.style.left) + distance + 'px';
+                node.edges.forEach(edgeId => {
+                    let svg = document.getElementById('edge' + edgeId); 
+                    svg.style.left = parseInt(svg.style.left) + distance + 'px';
+                })
+                node.children.forEach(child => {
+                    moveNode(ids[child].ele,distance);
+                })
+            }
+        }
+
+        function moveEdge(edgeId,distance,direction){
+            let fromSvg = document.getElementById('edge'+edgeId);
+            updateEdge(fromSvg,fromSvg.getAttribute('width') * 1 + Math.abs(distance),80,direction);
+            if(direction == 'l'){
+                fromSvg.style.left = parseInt(fromSvg.style.left) + distance + 'px';
+            }
+        }
+    */
+    </script>
+    
+</body>
+</html>
