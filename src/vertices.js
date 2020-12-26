@@ -1,3 +1,4 @@
+import {VERTICES_WIDTH,VERTICES_PADDING} from './const.js';
 class Vertices{
     constructor(option){
         this.id = option.id;
@@ -11,7 +12,7 @@ class Vertices{
         this.ele = this.createEle(option.id);
         this.top = option.top;
         this.left = this.begin = option.left;
-        this.end = this.begin + 200;
+        this.end = this.begin + VERTICES_WIDTH;
         this.setPosition();
     }
 
@@ -54,9 +55,9 @@ class Vertices{
 
     move(distance,top){
         this.left += distance;
-        let space = (this.width - 200) >> 1;
+        let space = (this.width - VERTICES_WIDTH) >> 1;
         this.begin = this.left - space;
-        this.end = this.left + 200 + space;
+        this.end = this.left + VERTICES_WIDTH + space;
         this.ele.style.left = this.left + 'px';
         if(top){
             this.top += top;
@@ -72,13 +73,11 @@ class Vertices{
     }
 
     updateWidth(){
-        let len = this.children.length;
-        //TODO 常量定义 node宽度200，间距20
-        // this.width =  len * 200 + (len - 1) * 20;
-        this.width = this.children.reduce((accu,current) => accu + current.width + 20,0) - 20;
-        let space = (this.width - 200) >> 1;
+        this.width = this.children.reduce((accu,current) => accu + current.width + VERTICES_PADDING,0) - VERTICES_PADDING;
+        let space = (this.width - VERTICES_WIDTH) >> 1;
         this.begin = this.left - space;
-        this.end = this.left + 200 + space;
+        this.end = this.left + VERTICES_WIDTH + space;
+        return this;
     }
 }
 
