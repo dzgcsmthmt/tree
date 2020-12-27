@@ -55,9 +55,11 @@ class Vertices{
 
     move(distance,top){
         this.left += distance;
-        let space = (this.width - VERTICES_WIDTH) >> 1;
-        this.begin = this.left - space;
-        this.end = this.left + VERTICES_WIDTH + space;
+        this.begin += distance;
+        this.end += distance;
+        // let space = (this.width - VERTICES_WIDTH) >> 1;
+        // this.begin = this.left - space;
+        // this.end = this.left + VERTICES_WIDTH + space;
         this.ele.style.left = this.left + 'px';
         if(top){
             this.top += top;
@@ -74,9 +76,19 @@ class Vertices{
 
     updateWidth(){
         this.width = this.children.reduce((accu,current) => accu + current.width + VERTICES_PADDING,0) - VERTICES_PADDING;
-        let space = (this.width - VERTICES_WIDTH) >> 1;
-        this.begin = this.left - space;
-        this.end = this.left + VERTICES_WIDTH + space;
+        this.begin = this.children[0].begin;
+        this.end = this.children[this.children.length - 1].end;
+        return this;
+    }
+
+    setBoundary(begin,end,isCal){
+        if(isCal){
+            this.begin += begin;
+            this.end += end;
+        }else{
+            this.begin = begin;
+            this.end = end;
+        }
         return this;
     }
 }
