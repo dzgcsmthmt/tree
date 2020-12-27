@@ -99,7 +99,7 @@ class Tree{
         if(len & 1){
             let child = node.children[mid];
             let oLeft = child.left; //原来的left位置
-            let left = center - child.width / 2; //新的left位置
+            let left = center - VERTICES_WIDTH / 2; //新的left位置
             let distance = -Math.abs(oLeft - left);
             child.move(distance);
             node.edges[mid].update(node.edges[mid].ele,EDGE_WIDTH,EDGE_HEIGHT,'v').setPosition(center - EDGE_WIDTH / 2);
@@ -175,51 +175,6 @@ class Tree{
         this.layoutParent(parent);
     }
 
-    relayout(node){
-        //需要递归向上
-        let parent = null;
-        let index = node.index;
-        node.updateWidth();
-        if(parent = node.parent){
-            let len = parent.children.length;
-            let mid = len >> 1;
-            //四种情况，左边，奇数中间，偶数中间，右边
-            if(index < mid){
-                this.handleLeft(parent,index);
-            }else{
-                if(len & 1 && index == mid){
-                    this.handleLeft(parent,index - 1);
-                    this.handleRight(parent,index + 1,len);
-                }else{
-                    this.handleRight(parent,index,len);
-                }
-                
-            }
-            this.relayout(parent);
-        }
-    }
-
-    handleLeft(parent,index){
-        for(var i = 0;i <= index;i++){
-            parent.children[i].move(i == index ? -(VERTICES_WIDTH + VERTICES_PADDING) / 2 : -(VERTICES_WIDTH + VERTICES_PADDING));
-            let svg = parent.children[i].fromEdge.ele;
-            parent.children[i].fromEdge.update(svg,parseInt(svg.getAttribute('width')) + (i == index ? (VERTICES_WIDTH + VERTICES_PADDING) / 2 : (VERTICES_WIDTH + VERTICES_PADDING)),EDGE_HEIGHT,'l').move(i == index ? -(VERTICES_WIDTH + VERTICES_PADDING) / 2 : -(VERTICES_WIDTH + VERTICES_PADDING));
-        }
-    }
-
-    handleRight(parent,index,len){
-        for(var i = index;i < len;i++){
-            parent.children[i].move(i == index ? (VERTICES_WIDTH + VERTICES_PADDING) / 2 : (VERTICES_WIDTH + VERTICES_PADDING));
-            let svg = parent.children[i].fromEdge.ele;
-            parent.children[i].fromEdge.update(svg,parseInt(svg.getAttribute('width')) + (i == index ? (VERTICES_WIDTH + VERTICES_PADDING) / 2 : (VERTICES_WIDTH + VERTICES_PADDING)),EDGE_HEIGHT,'r');
-        }
-    }
-
-    handleMid(){
-
-    }
-
-    
     bindEvent(){
         this.container.addEventListener('click',(ev) => {
             let target = ev.target;
