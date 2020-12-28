@@ -60,6 +60,46 @@ class Tree{
     }
 
     /**
+     * 
+     * @param {要删除的节点} node
+     * 五种情况
+     * 1.没有兄弟节点，有多个子节点，级联删除，父节点重新布局，递归向上
+     * 2.没有兄弟节点，单个子节点，直接删除，下面的节点上移
+     * 3.有兄弟节点，有多个子节点，级联删除，兄弟节点重新布局，递归向上
+     * 4.有兄弟节点，无子节点，兄弟节点重新布局，递归向上
+     * 5.有兄弟节点，有单个子节点，直接删除，下面的节点上移
+     */
+    deleteVertices(node){
+        if(!node.parent){
+            alert('根节点无法删除')
+        }
+
+        this.dfsDelete(node);
+        // this.layoutCurrent(node.parent);
+        // if(node.parent && node.parent.parent && node.parent.parent.children.length > 1){
+        //     this.layoutParent(node.parent)
+        // }
+
+        console.log(this.edgesMap,this.verticesMap);
+
+    }
+
+    dfsDelete(node){
+        var edge = node.fromEdge;
+        delete this.edgesMap[edge.id];
+        edge.ele.parentNode.removeChild(edge.ele);
+        delete this.verticesMap[node.id];
+        node.parent && node.parent.children.splice(node.index,1);
+        node.ele.parentNode.removeChild(node.ele);
+        // node.children.forEach(child => {
+        //     this.dfsDelete(child);
+        // })
+        for(var i = node.children.length - 1;i >= 0;i--){
+            this.dfsDelete(node.children[i]);
+        }
+    }
+
+    /**
     * 简化思路 
     * 1.奇数个点 以中间为基准算两边
     * 2.偶数个点 以中间2个元素为基准两边扩散 
@@ -106,16 +146,20 @@ class Tree{
         }else{
             //左边
             let child = node.children[mid - 1];
-            let oLeft = child.left;
-            let left = center - VERTICES_PADDING / 2 - child.width + (child.width - VERTICES_WIDTH) / 2;
-            let distance = -Math.abs(oLeft - left);
+            // let oLeft = child.left;
+            // let left = center - VERTICES_PADDING / 2 - child.width + (child.width - VERTICES_WIDTH) / 2;
+            // let distance = -Math.abs(oLeft - left);
+            let distance = -Math.abs(center - VERTICES_PADDING / 2 - child.end);
+            let left = child.left + distance;
             child.move(distance);
             node.edges[mid - 1].update(node.edges[mid - 1].ele,Math.abs(left - parentLeft),EDGE_HEIGHT,'l').setPosition(left + VERTICES_WIDTH / 2);
             //右边
             child = node.children[mid];
-            oLeft = child.left;
-            left = center + VERTICES_PADDING / 2 + (child.width - VERTICES_WIDTH) / 2;
-            distance = -Math.abs(oLeft - left);
+            // oLeft = child.left;
+            // left = center + VERTICES_PADDING / 2 + (child.width - VERTICES_WIDTH) / 2;
+            // distance = -Math.abs(oLeft - left);
+            distance = -Math.abs(center + VERTICES_PADDING / 2 - child.begin);
+            left = child.left + distance;
             child.move(distance);
             node.edges[mid].update(node.edges[mid].ele,Math.abs(left - parentLeft),EDGE_HEIGHT,'r').setPosition(center);
         }

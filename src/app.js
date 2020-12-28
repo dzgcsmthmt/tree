@@ -11,5 +11,5 @@ addBtn.addEventListener('click',function(){
 },false);
 
 delBtn.addEventListener('click',function(){
-
+    tree.deleteVertices(tree.current);
 },false);
